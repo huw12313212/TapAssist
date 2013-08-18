@@ -42,10 +42,12 @@ public class Main {
 		  Experience ScrollingExperience = new Experience(ScrollingList);
 		  
 		  
-		  String result = ScrollingExperience.ExportScrollingAttemptAnalysisAsCSV();
-		 
-		  SaveAsFile(result,"./Result/F5_slop24_scroll.csv");
+		  String result_Scroll = ScrollingExperience.ExportScrollingAttemptAnalysisAsCSV();
 		  
+		  String result_Tap = TappingExperience.ExportTappingAttemptAnalysisAsCSV();
+		 
+		  SaveAsFile(result_Scroll,"./Result/F5_slop24_scroll.csv");
+		  SaveAsFile(result_Tap,"./Result/F5_slop24_tap.csv");
 		 
 	  }
 	  
