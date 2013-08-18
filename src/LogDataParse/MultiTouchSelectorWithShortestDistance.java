@@ -31,7 +31,10 @@ public class MultiTouchSelectorWithShortestDistance extends MultiTouchSelector{
 			}
 		}
 		
+		if(target.length()>1)
+		{
 		//System.out.println("shortest:"+index+ " from:"+target.length());
+		}
 		
 		return shortest;
 		//return ;

@@ -19,6 +19,18 @@ public class Task {
 	
 	public Boolean Corrupted = false;
 	
+	
+	
+	public String GetTaskDescription()
+	{
+		JSONObject meta = TaskHead.getJSONObject("metadata");
+		
+		Long from = meta.getLong("initialSelection");
+		Long to = meta.getLong("targetSelection");
+		
+		return from + "->" + to;
+	}
+	
 	public double GetTargetX()
 	{
 		JSONObject meta = TaskHead.getJSONObject("metadata");

@@ -22,6 +22,193 @@ public class AttemptSegment {
 		return true;
 	}
 	
+	public int getActionDownNumber()
+	{
+		int sum = 0;
+		for(int i = 0; i < TouchEventList.size();i++)
+		{
+			if(TouchEventList.get(i).getString("action").contains("DOWN"))
+			{
+				sum ++;
+			}
+		}
+		
+		return sum;
+	}
+	
+	public double getPathLength(MultiTouchSelector selector)
+	{
+		double sum = 0;
+		
+		for(int i = 1;i < TouchEventList.size();i++)
+		{
+			JSONArray previousPointers = TouchEventList.get(i-1).getJSONArray("pointers"); 
+			JSONArray nowPointers = TouchEventList.get(i).getJSONArray("pointers");
+			
+			JSONObject previousPointer = selector.Select(previousPointers);
+			JSONObject nowPointer = selector.Select(nowPointers);
+			
+			double x1 = previousPointer.getDouble("x");
+			double y1 = previousPointer.getDouble("y");
+			double x2 = nowPointer.getDouble("x");
+			double y2 = nowPointer.getDouble("y");
+			
+			double difX = x2 - x1;
+			double difY = y2 - y1;
+			double Distance = Math.sqrt((difX * difX) + (difY*difY));
+			
+			sum += Distance;
+		}
+		
+		return sum;
+	}
+	
+	public String GetMinSpeed(MultiTouchSelector selector)
+	{
+		 List<Double> SpeedList = getSpeedList(selector);
+		 
+		 if(SpeedList.size()==0)
+		 {
+			 return "NaN";
+		 }
+		 else
+		 {
+			 double min = SpeedList.get(0);
+			 
+			 for(int i = 0;i < SpeedList.size();i++)
+			 {
+				 double current =SpeedList.get(i);
+				 
+				 if(current < min)
+				 {
+					 min = current;
+				 }
+			 }
+			 
+			 return min+"";
+		 }
+	}
+	
+	public String GetMaxSpeed(MultiTouchSelector selector)
+	{
+		 List<Double> SpeedList = getSpeedList(selector);
+		 
+		 if(SpeedList.size()==0)
+		 {
+			 return "NaN";
+		 }
+		 else
+		 {
+			 double max = SpeedList.get(0);
+			 
+			 for(int i = 0;i < SpeedList.size();i++)
+			 {
+				 double current =SpeedList.get(i);
+				 
+				 if(current > max)
+				 {
+					 max = current;
+				 }
+			 }
+			 
+			 return max+"";
+		 }
+	}
+	
+	public String GetAveSpeed(MultiTouchSelector selector)
+	{
+		 List<Double> SpeedList = getSpeedList(selector);
+		 
+		 if(SpeedList.size()==0)
+		 {
+			 return "NaN";
+		 }
+		 else
+		 {
+			 double sum = 0;
+			 
+			 for(int i=0;i<SpeedList.size();i++)
+			 {
+				 sum += SpeedList.get(i);
+			 }
+			 
+			 double mean = sum/SpeedList.size();
+			 
+			 return mean+"";
+		 }
+	}
+	
+	public String GetSDSpeed(MultiTouchSelector selector)
+	{
+		List<Double> SpeedList = getSpeedList(selector);
+		 
+		 if(SpeedList.size()==0)
+		 {
+			 return "NaN";
+		 }
+		 else
+		 {
+			 double sumSquare = 0;
+			// System.out.println("---");
+			 for(int i=0;i<SpeedList.size();i++)
+			 {
+				 double data = SpeedList.get(i);
+				 
+				 //System.out.println(data);
+				 sumSquare += data*data;
+			 }
+			 
+			 double SquareMean = sumSquare/SpeedList.size();
+			 
+			 double Mean = Double.valueOf(GetAveSpeed(selector));
+			 
+			 double MeanSquare = Mean*Mean;
+			 
+			 double sd = Math.sqrt(SquareMean - MeanSquare);
+			 
+			// System.out.println("result"+sd);
+			 
+			 return sd+"";
+		 }
+	}
+	
+	
+	
+	public List<Double> getSpeedList(MultiTouchSelector selector)
+	{
+		List<Double> speedList = new ArrayList<Double>();
+		//System.out.println(Distance);
+		for(int i = 1;i < TouchEventList.size();i++)
+		{
+			JSONArray previousPointers = TouchEventList.get(i-1).getJSONArray("pointers"); 
+			JSONArray nowPointers = TouchEventList.get(i).getJSONArray("pointers");
+			
+			JSONObject previousPointer = selector.Select(previousPointers);
+			JSONObject nowPointer = selector.Select(nowPointers);
+			
+			double x1 = previousPointer.getDouble("x");
+			double y1 = previousPointer.getDouble("y");
+			double x2 = nowPointer.getDouble("x");
+			double y2 = nowPointer.getDouble("y");
+			
+			double difX = x2 - x1;
+			double difY = y2 - y1;
+			double Distance = Math.sqrt((difX * difX) + (difY*difY));
+			
+			//System.out.println(Distance);
+			double TimeDif = (TouchEventList.get(i).getDouble("time") - TouchEventList.get(i-1).getDouble("time"))/1000;
+			
+			//here is weird
+			if(Distance != 0)
+			{
+				speedList.add(Distance/TimeDif);
+			}
+			
+		}
+		
+		return speedList;
+	}
+	
 	public double getDif(MultiTouchSelector selector,String key)
 	{
 		double result = 0;
@@ -50,17 +237,13 @@ public class AttemptSegment {
 		{
 			double data = allPointers.get(i).getDouble(key);
 			sumSquare+= (data*data);
-			
 		}
 		
 		double SquareMean = sumSquare / allPointers.size();
 		double Mean = getMean(selector,key);
 		double MeanSqure = Mean*Mean;
-		
 		double result = Math.sqrt(SquareMean - MeanSqure);
 	
-		
-		
 		return result;
 	}
 	
