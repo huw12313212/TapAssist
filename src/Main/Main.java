@@ -11,12 +11,37 @@ import org.json.JSONObject;
 import LogDataParse.Experience;
 import LogDataParse.LogDataParse;
 import LogDataParse.TaskSegment;
+import Model.TapAssistAnalysis;
 
 public class Main {
 
+	 public static String ContentDir = "./Content/";
+	 public static String ResultDir = "./Result/";
+	
 	  public static void main(String args[]) throws Exception 
 	  {
-		  File file = new File("./Content/F5*1*24_2013_08_14_11_34_44.txt");
+		
+		  
+		  File f = new File(ContentDir);
+		  
+		  File[] list = f.listFiles();
+		  
+		  for(int i = 0;i<list.length;i++)
+		  {
+			  String path = list[i].getAbsolutePath();
+			  
+			  if(path.endsWith(".txt"))
+			  {
+			  System.out.println(path);
+			  ProcessFile(path);
+			  }
+		  }
+
+	  }
+	  
+	  public static void ProcessFile(String filePath)throws Exception 
+	  {
+		  File file = new File(filePath);
 		  
 		  List<String> strList = LogDataParse.getFileStrings(file);
 		  
@@ -32,32 +57,39 @@ public class Main {
 		  List<TaskSegment> ScrollingList = new ArrayList<TaskSegment>();
 		  LogDataParse.SplitTwoTask(ValidateSegmentList, TappingList, ScrollingList);
 		  
+		  System.out.println("[File] ParseFile :" + filePath);
 		  System.out.println("[Phase1] ParseFile :" + Detail(strList,jsonList));
 		  System.out.println("[Phase2] EliminateOverlapLog :" + Detail(jsonList,overlapFreeJsonList));
 		  System.out.println("[Phase3] analysisTaskSegment :" + Detail(overlapFreeJsonList,SegmentList));
 		  System.out.println("[Phase4] ValidateSegmentList :" + Detail(SegmentList,ValidateSegmentList));
 		  System.out.println("[Phase5] Split : Tap("+TappingList.size()+")" +" Scroll("+ScrollingList.size()+")");
+		
 		  
 		  Experience TappingExperience = new Experience(TappingList);
 		  Experience ScrollingExperience = new Experience(ScrollingList);
 		  
+		  System.out.println("------");
 		  
 		  String result_Scroll = ScrollingExperience.ExportScrollingAttemptAnalysisAsCSV();
 		  
 		  String result_Tap = TappingExperience.ExportTappingAttemptAnalysisAsCSV();
 		 
-		  SaveAsFile(result_Scroll,"./Result/F5_slop24_scroll.csv");
-		  SaveAsFile(result_Tap,"./Result/F5_slop24_tap.csv");
-		 
+		  SaveAsFile(result_Scroll,ResultDir + file.getName().replace(".txt","_scroll.csv"));
+		  SaveAsFile(result_Tap,ResultDir + file.getName().replace(".txt","_tap.csv"));
+		  
+		  
+		  TapAssistAnalysis analysis = new TapAssistAnalysis(TappingExperience,ScrollingExperience);
+		  String CDFResult = analysis.getCDF();
+		  
+		  SaveAsFile(CDFResult,ResultDir + file.getName().replace(".txt","_CDF.csv"));
+		  
 	  }
 	  
 	  public static void SaveAsFile(String data,String filePath)
 	  {
 		  File file = new File(filePath);
-		  
 		  FileWriter fw;
 		  
-	  
 		try 
 		{
 			fw = new FileWriter(file);

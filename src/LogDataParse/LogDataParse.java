@@ -276,6 +276,7 @@ public class LogDataParse {
 		for(int i = 0; i < logLines.size(); i ++)
 		{
 			String line = logLines.get(i);
+			//System.out.println(i+1);
 			JSONObject jsonObject = new JSONObject(line);
 			jsonObject.put("line", i+1);
 			jsonList.add(jsonObject);

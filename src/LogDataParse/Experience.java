@@ -19,6 +19,48 @@ public class Experience
 		}
 	}
 	
+	public List<Double> getAllDistTapping(String key)
+	{
+		List<Double> result = new ArrayList<Double>();
+		
+		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
+		{
+			Task task = taskList.get(taskNum);
+			List<AttemptSegment> attemptList = task.AttemptList;
+			
+			for(int attemptNum = 0 ; attemptNum < attemptList.size(); attemptNum++)
+			{
+				AttemptSegment nowAttempt = attemptList.get(attemptNum);
+				MultiTouchSelector selector =  new MultiTouchSelectorWithShortestDistance(task.GetTargetX(),task.GetTargetY());
+				
+				result.add(nowAttempt.getDif(selector, key));
+			}
+		}
+		return result;
+	}
+	
+	public List<Double> getAllDistScroll(String key)
+	{
+		List<Double> result = new ArrayList<Double>();
+		
+		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
+		{
+			Task task = taskList.get(taskNum);
+			List<AttemptSegment> attemptList = task.AttemptList;
+			
+			for(int attemptNum = 0 ; attemptNum < attemptList.size(); attemptNum++)
+			{
+				AttemptSegment nowAttempt = attemptList.get(attemptNum);
+				MultiTouchSelector selector =  multiTouchSelector;
+				
+				result.add(nowAttempt.getDif(selector, key));
+			}
+		}
+		return result;
+	}
+	
+	
+	
 	public String ExportScrollingAttemptAnalysisAsCSV()
 	{
 		String data = "Task,Attempt,Task_Detail,begin_time(ms),end_time(ms)," +
@@ -107,7 +149,6 @@ public class Experience
 				data +=(nowAttempt.getBeginTime() - taskList.get(0).GetTaskBeginTime())+",";
 				data +=(nowAttempt.getEndTime()- taskList.get(0).GetTaskBeginTime())+",";
 				
-		
 				
 				data += nowAttempt.getBeginX(selector)+",";
 				data += nowAttempt.getBeginY(selector)+",";
