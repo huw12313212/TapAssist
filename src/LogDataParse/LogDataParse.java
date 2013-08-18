@@ -16,6 +16,140 @@ public class LogDataParse {
 		findingEnd,
 	}
 	
+	
+	public static void SplitTwoTask(List<TaskSegment> orginData,List<TaskSegment> tappingList,List<TaskSegment> scrollingList)
+	{
+		for(int i = 0 ; i < orginData.size() ; i++)
+		{
+			TaskSegment currentTask = orginData.get(i);
+			TaskSegment.taskType type = currentTask.GetTaskType();
+			
+			if(type == TaskSegment.taskType.tap)
+			{
+				tappingList.add(currentTask);
+			}
+			else if(type == TaskSegment.taskType.scroll)
+			{
+				scrollingList.add(currentTask);
+			}
+			else
+			{
+				System.err.println("undefined type");
+			}
+		}
+	}
+	
+	public static List<JSONObject> EliminateOverlapLog(List<JSONObject> originData,boolean showLog)
+	{
+		List<JSONObject> result = new ArrayList<JSONObject>();
+		
+		JSONObject PreviousValidate = null;
+		
+		for(int i = 0 ;i <originData.size();i++)
+		{
+			JSONObject nowObject = originData.get(i);
+			String logType = nowObject.getString("logType");
+			
+			if(logType.equals("touchEvent"))
+			{
+				result.add(nowObject);
+			}
+			else if(logType.equals("task"))
+			{
+				if(isValidate(PreviousValidate,nowObject,showLog))
+				{
+					result.add(nowObject);
+					PreviousValidate = nowObject;
+				}
+				else
+				{
+					
+				}
+				
+			}
+			else
+			{
+				System.err.println("unmanaged case");
+			}
+		}
+		
+		
+		
+		return result;
+	}
+	
+	private static boolean isValidate(JSONObject previous,JSONObject next,boolean showLog)
+	{
+		int previous_taskNumber;
+		String previous_taskAction;
+		
+		int next_taskNumber;
+		String next_taskAction;
+		
+		next_taskNumber = (int)next.getLong("taskNum");
+		next_taskAction = next.getString("taskAction");
+		
+		if(next_taskNumber == 0 && next_taskAction.equals("start"))
+		{
+			return true;
+		}
+		
+		if(previous == null)
+		{
+			if(showLog)
+			{
+				System.out.println("["+next.getInt("line")+"] ignore by not found start");
+			}
+			return false;
+		}
+		else
+		{
+			previous_taskNumber = (int)previous.getLong("taskNum");
+			previous_taskAction = previous.getString("taskAction");
+			
+			if(previous_taskAction.equals("start")&&next_taskAction.equals("end"))
+			{
+				if(previous_taskNumber == next_taskNumber)
+				{
+					return true;
+				}
+				else
+				{
+					if(showLog)
+					{
+						System.out.println("["+next.getInt("line")+"] ignore by overlap");
+					}
+					return false;
+				}
+			}
+			else if(previous_taskAction.equals("end")&&next_taskAction.equals("start"))
+			{
+				if((previous_taskNumber+1) == next_taskNumber)
+				{
+					return true;
+				}
+				else
+				{
+					if(showLog)
+					{
+						System.out.println("["+next.getInt("line")+"] ignore by overlap");
+					}
+					return false;
+				}
+			}
+			else
+			{
+				if(showLog)
+				{
+					System.out.println("["+next.getInt("line")+"] ignore by overlap");
+				}
+				return false;
+			}
+			
+		}
+
+	}
+	
 	public static List<TaskSegment> FindValidateSegment(List<TaskSegment> originList , boolean showLog)
 	{
 		List<TaskSegment> validateList = new ArrayList<TaskSegment>();
@@ -54,6 +188,7 @@ public class LogDataParse {
 		for(int i = 0 ; i < jsonList.size() ; i++)
 		{
 			JSONObject jsonObject = jsonList.get(i);
+			int num = jsonObject.getInt("line");
 			String typeString = jsonObject.getString("logType");
 	
 			switch(state)
@@ -72,7 +207,7 @@ public class LogDataParse {
 					}
 					else if (taskActionString.equals("end"))
 					{
-						if(errMessage)System.err.println("["+i+"]"+": start end pair failed : 1");
+						if(errMessage)System.err.println("["+num+"]"+": start end pair failed : 1");
 					}
 					else
 					{
@@ -84,7 +219,7 @@ public class LogDataParse {
 				{
 					ignoreList.add(jsonObject);
 					
-					if(errMessage)System.err.println("end <-> start : ignore");
+					if(errMessage)System.err.println("["+num+"]"+"end <-> start : ignore");
 				}
 				else
 				{
@@ -130,14 +265,6 @@ public class LogDataParse {
 				break;
 			}
 		}
-		
-		
-		/*
-		int originLength = jsonList.size();
-		int ignoreLength = ignoreList.size();
-		
-		System.out.println("origin:"+originLength+" ignore:"+ignoreLength);*/
-		
 		
 		return taskSegmentList;
 	}

@@ -22,6 +22,34 @@ public class TaskSegment
 		return JsonList.get(TailIndex);
 	}
 	
+	public enum taskType
+	{
+		tap,
+		scroll,
+		undifined
+	} 
+	
+	
+	public taskType GetTaskType()
+	{
+		if(getHead().getString("taskType").contains("scroll"))
+		{
+			return taskType.scroll;
+		}
+		else if(getHead().getString("taskType").contains("tap"))
+		{
+			return taskType.tap;
+		}
+		else
+		{
+			System.err.println("taskType.undifined");
+			return taskType.undifined;
+		}
+		
+		
+	}
+	
+	
 	
 	
 	public boolean isValidate(boolean showLog)
@@ -62,7 +90,6 @@ public class TaskSegment
 				return false;
 			}
 		}
-		//System.out.println("type true");
 		return true;
 	}
 	
