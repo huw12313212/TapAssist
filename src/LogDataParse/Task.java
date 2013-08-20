@@ -31,6 +31,30 @@ public class Task {
 		return from + "->" + to;
 	}
 	
+	public String GetResult()
+	{
+		JSONObject meta = TaskTail.getJSONObject("metadata");
+		
+		String result = meta.getString("result");
+		
+		return result;
+	}
+	
+	public String GetReason()
+	{
+		JSONObject meta = TaskTail.getJSONObject("metadata");
+		
+		String result = meta.getString("result");
+		String reason = "";
+		
+		if(result.equals("fail"))
+		{
+			reason = meta.getString("reason");
+		}
+		
+		return reason;
+	}
+	
 	public double GetTargetX()
 	{
 		JSONObject meta = TaskHead.getJSONObject("metadata");

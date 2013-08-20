@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import LogDataParse.Experience;
 import LogDataParse.LogDataParse;
+import LogDataParse.NoiseFilter;
 import LogDataParse.TaskSegment;
 import Model.TapAssistAnalysis;
 
@@ -67,6 +68,20 @@ public class Main {
 		  
 		  Experience TappingExperience = new Experience(TappingList);
 		  Experience ScrollingExperience = new Experience(ScrollingList);
+		  
+		  
+		  String filterPath = filePath.replace(".txt", "_filter.json");
+		  File filterFile = new File(filterPath);
+		  if(filterFile.exists())
+		  {
+			  NoiseFilter noisfilter = new NoiseFilter(filterFile);
+			  
+			  System.out.print("[Phase6] ");
+			  noisfilter.FilterOutTap(TappingExperience);
+			  noisfilter.FilterOutScroll(ScrollingExperience);
+			  System.out.println("");
+		  }
+		  
 		  
 		  System.out.println("------");
 		  
