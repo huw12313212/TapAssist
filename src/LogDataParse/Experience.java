@@ -19,6 +19,16 @@ public class Experience
 		}
 	}
 	
+	public void ModifyPosition()
+	{
+		for(int i = 0; i< taskList.size(); i++)
+		{
+			Task nowSegment = taskList.get(i);
+			
+			nowSegment.ModifyPosition();
+		}
+	}
+	
 	public List<Double> getAllDistTapping(String key)
 	{
 		List<Double> result = new ArrayList<Double>();
@@ -59,12 +69,52 @@ public class Experience
 		return result;
 	}
 	
+	public List<Double> getAllTapPathLength()
+	{
+		List<Double> result = new ArrayList<Double>();
+		
+		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
+		{
+			Task task = taskList.get(taskNum);
+			List<AttemptSegment> attemptList = task.AttemptList;
+			
+			for(int attemptNum = 0 ; attemptNum < attemptList.size(); attemptNum++)
+			{
+				AttemptSegment nowAttempt = attemptList.get(attemptNum);
+				MultiTouchSelector selector =  new MultiTouchSelectorWithShortestDistance(task.GetTargetX(),task.GetTargetY());
+				
+				result.add(nowAttempt.getPathLength(selector));
+			}
+		}
+		return result;
+	}
+	
+	
+	public List<Double> getAllScrollPathLength()
+	{
+		List<Double> result = new ArrayList<Double>();
+		
+		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
+		{
+			Task task = taskList.get(taskNum);
+			List<AttemptSegment> attemptList = task.AttemptList;
+			
+			for(int attemptNum = 0 ; attemptNum < attemptList.size(); attemptNum++)
+			{
+				AttemptSegment nowAttempt = attemptList.get(attemptNum);
+				MultiTouchSelector selector =  multiTouchSelector;
+				
+				result.add(nowAttempt.getPathLength(selector));
+			}
+		}
+		return result;
+	}
 	
 	
 	public String ExportScrollingAttemptAnalysisAsCSV()
 	{
 		String data = "Task,Attempt,Task_Detail,begin_time(ms),end_time(ms)," +
-				"touchBegin_x,touchBegin_y,max_x,max_y,min_x,min_y,ave_x," +
+				"touchBegin_x,touchBegin_y,touchEnd_x,touchEnd_y,max_x,max_y,min_x,min_y,ave_x," +
 				"ave_y,SD_x,SD_y,x_end-begin,y_end-begin,Max_speed,Min_speed,Ave_speed," +
 				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration\n";
 		
@@ -91,6 +141,8 @@ public class Experience
 				
 				data += nowAttempt.getBeginX(selector)+",";
 				data += nowAttempt.getBeginY(selector)+",";
+				data += nowAttempt.getEnd(selector, "x")+",";
+				data += nowAttempt.getEnd(selector, "y")+",";
 				data += nowAttempt.getMax(selector, "x")+",";
 				data += nowAttempt.getMax(selector, "y")+",";
 				data += nowAttempt.getMin(selector, "x")+",";
@@ -184,7 +236,7 @@ public class Experience
 	public String ExportTappingAttemptAnalysisAsCSV()
 	{
 		String data = "Task,Attempt,result,reason,TargetX,TargetY,begin_time(ms),end_time(ms)," +
-				"touchBegin_x,touchBegin_y,max_x,max_y,min_x,min_y,ave_x," +
+				"touchBegin_x,touchBegin_y,touchEnd_x,touchEnd_y,max_x,max_y,min_x,min_y,ave_x," +
 				"ave_y,SD_x,SD_y,x_end-begin,y_end-begin,Max_speed,Min_speed,Ave_speed," +
 				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration\n";
 		
@@ -212,6 +264,11 @@ public class Experience
 				
 				data += nowAttempt.getBeginX(selector)+",";
 				data += nowAttempt.getBeginY(selector)+",";
+				
+
+				data += nowAttempt.getEnd(selector, "x")+",";
+				data += nowAttempt.getEnd(selector, "y")+",";
+				
 				data += nowAttempt.getMax(selector, "x")+",";
 				data += nowAttempt.getMax(selector, "y")+",";
 				data += nowAttempt.getMin(selector, "x")+",";

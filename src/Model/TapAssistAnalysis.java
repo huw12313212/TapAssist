@@ -9,10 +9,12 @@ import Model.TapAssistDataEntry.DistancePolicy;
 
 public class TapAssistAnalysis {
 	
-	
+
+	//DifXY
 	ArrayList<TapAssistDataEntry> tapDistX = new ArrayList<TapAssistDataEntry>();
 	ArrayList<TapAssistDataEntry> tapDistY = new ArrayList<TapAssistDataEntry>();
 	ArrayList<TapAssistDataEntry> tapDistXY = new ArrayList<TapAssistDataEntry>();
+
 	
 	ArrayList<TapAssistDataEntry> scrollX = new ArrayList<TapAssistDataEntry>();
 	ArrayList<TapAssistDataEntry> scrollY = new ArrayList<TapAssistDataEntry>();
@@ -26,6 +28,16 @@ public class TapAssistAnalysis {
 	ArrayList<Float> scrollXCDF = new ArrayList<Float>();
 	ArrayList<Float> scrollYCDF = new ArrayList<Float>();
 	ArrayList<Float> scrollXYCDF = new ArrayList<Float>();
+	//DifXY
+	
+	//path
+	ArrayList<TapAssistDataEntry> TapPath = new ArrayList<TapAssistDataEntry>();
+	ArrayList<TapAssistDataEntry> ScrollPath = new ArrayList<TapAssistDataEntry>();
+	
+	ArrayList<Float> TapPathCDF = new ArrayList<Float>();
+	ArrayList<Float> ScrollPathCDF = new ArrayList<Float>();
+
+	
 	
 	public TapAssistAnalysis(Experience tap,Experience scroll)
 	{
@@ -35,10 +47,28 @@ public class TapAssistAnalysis {
 		List<Double> scrollx = scroll.getAllDistScroll("x");
 		List<Double> scrolly = scroll.getAllDistScroll("y");
 		
+		
+		List<Double> pathTap = tap.getAllTapPathLength();
+		List<Double> pathScroll = scroll.getAllScrollPathLength();
+		
+		
 		if(tapX.size()==0 || scrollx.size()==0)
 		{
 			return;
 		}
+		
+		for(int i = 0; i < pathTap.size() ; i++)
+		{
+			TapPath.add(new TapAssistDataEntry(pathTap.get(i).floatValue(),pathTap.get(i).floatValue(),DistancePolicy.XOnly));
+		}
+		
+		
+		for(int i = 0; i < pathScroll.size() ; i++)
+		{
+			ScrollPath.add(new TapAssistDataEntry(pathScroll.get(i).floatValue(),pathScroll.get(i).floatValue(),DistancePolicy.XOnly));
+		}
+		
+		
 		
 		
 		for(int i = 0;i<tapX.size();i++)
@@ -63,6 +93,9 @@ public class TapAssistAnalysis {
 		Collections.sort(scrollY, new TapDistanceComparator());
 		Collections.sort(scrollXY, new TapDistanceComparator());
 		
+		Collections.sort(TapPath, new TapDistanceComparator());
+		Collections.sort(ScrollPath, new TapDistanceComparator());
+		
 		float maximum = getMaximun();
 		
 	    tapDistXCDF = GetCDF(tapDistX,maximum);
@@ -72,6 +105,10 @@ public class TapAssistAnalysis {
 	    scrollXCDF = GetCDF(scrollX,maximum);
 	    scrollYCDF = GetCDF(scrollY,maximum);
 	    scrollXYCDF = GetCDF(scrollXY,maximum);
+	    
+	    float maximum2 = getMaximum2();
+	    TapPathCDF = GetCDF(TapPath,maximum2);
+	    ScrollPathCDF = GetCDF(ScrollPath,maximum2);
 	    
 	}
 	
@@ -93,6 +130,38 @@ public class TapAssistAnalysis {
 		return data;
 	}
 	
+	public String getPathCDF()
+	{
+		if(TapPath.size()==0 || ScrollPath.size()==0)
+		{
+			return "CDF failed";
+		}
+		
+		String data = "CDF,dist,tapPath,scrollPath,,CorrectRatio,tap%,scroll%,(Tap+Scroll)%\n";
+		
+		for(int i = 0 ; i < TapPathCDF.size();i++)
+		{
+			data += ","+i+","+TapPathCDF.get(i)+","+ScrollPathCDF.get(i)+",,,"+TapPathCDF.get(i)+","+(1-ScrollPathCDF.get(i))+","+((1-ScrollPathCDF.get(i))+TapPathCDF.get(i))+"\n";
+		}
+		
+		
+		
+		return data;
+	}
+	
+	public float getMaximum2()
+	{
+		float result = this.TapPath.get(TapPath.size()-1).getDistance();
+		
+		float temp = 0;
+		
+		temp = ScrollPath.get(ScrollPath.size()-1).getDistance();
+		
+		if(temp>result)result = temp;
+		
+		return result;
+		
+	}
 	
 	public float getMaximun()
 	{

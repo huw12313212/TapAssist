@@ -227,6 +227,19 @@ public class AttemptSegment {
 		return result;
 	}
 	
+	public double getEnd(MultiTouchSelector selector,String key)
+	{
+		double result = 0;
+		
+		JSONArray tailPointers = this.getTail().getJSONArray("pointers");
+		JSONObject tailPointer = selector.Select(tailPointers);
+		double endValue = tailPointer.getDouble(key);
+		
+		result = endValue;
+		
+		return result;
+	}
+	
 	public double getSD(MultiTouchSelector selector,String key)
 	{
 		List<JSONObject> allPointers = getSelectedPointer(selector);
@@ -304,6 +317,34 @@ public class AttemptSegment {
 		
 		return MinX;
 	}
+	
+	
+	public void SetOffset(float X,float Y)
+	{
+		for(int i = 0 ; i < TouchEventList.size(); i ++)
+		{
+			JSONObject nowTouchEvent = TouchEventList.get(i);
+			JSONArray pointers = nowTouchEvent.getJSONArray("pointers");
+			
+			for(int j = 0;  j<pointers.length() ; j++ )
+			{
+				JSONObject point = pointers.getJSONObject(j);
+				
+				Double x = point.getDouble("x");
+				Double y = point.getDouble("y");
+				
+				point.remove("x");
+				point.remove("y");
+				
+				x += X;
+				y += Y;
+				
+				point.put("x", x);
+				point.put("y", y);
+			}
+		}
+	}
+	
 	
 	public List<JSONObject> getSelectedPointer(MultiTouchSelector selector)
 	{

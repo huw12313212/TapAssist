@@ -8,6 +8,13 @@ import org.json.JSONObject;
 
 public class Task {
 	
+	
+	//public static float ModifyPositionIfTapInX = 0;//914.76514f;
+	//public static float ModifyPositionIfTapInY = 0;//595.663f;
+	
+	public static float ModifyPositionIfTapOutX = 0f;
+	public static float ModifyPositionIfTapOutY = 56.0f;
+	
 	public Task(TaskSegment originData)
 	{
 		initialize(originData);
@@ -19,7 +26,55 @@ public class Task {
 	
 	public Boolean Corrupted = false;
 	
+	public Boolean Modified = false;
 	
+	public void ModifyPosition()
+	{
+		if(!Modified)
+		{
+			Modified = true;
+			
+			if(IsTapDownCorrect())
+			{	
+				SetOffset((float)this.GetTargetX(),(float)this.GetTargetY());
+			}
+			else
+			{
+				SetOffset(ModifyPositionIfTapOutX,ModifyPositionIfTapOutY);
+			}
+		}
+		else
+		{
+			System.err.println("Duplicated Modify Position?");
+		}
+	}
+	
+	private void SetOffset(float X,float Y)
+	{
+		for(int i = 0;i<this.AttemptList.size();i++)
+		{
+			AttemptList.get(i).SetOffset(X, Y);
+		}
+	}
+	
+	public Boolean IsTapDownCorrect()
+	{
+		if(GetResult().equals("success"))
+		{
+			return true;
+		}
+		else
+		{
+			if(GetReason().equals("over_slop"))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
 	
 	public String GetTaskDescription()
 	{
@@ -66,7 +121,7 @@ public class Task {
 	{
 		JSONObject meta = TaskHead.getJSONObject("metadata");
 		
-		return meta.getDouble("targetY");
+		return meta.getDouble("targetY")+ModifyPositionIfTapOutY;
 	}
 	
 	public double GetTaskBeginTime()

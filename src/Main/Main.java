@@ -64,10 +64,15 @@ public class Main {
 		  System.out.println("[Phase3] analysisTaskSegment :" + Detail(overlapFreeJsonList,SegmentList));
 		  System.out.println("[Phase4] ValidateSegmentList :" + Detail(SegmentList,ValidateSegmentList));
 		  System.out.println("[Phase5] Split : Tap("+TappingList.size()+")" +" Scroll("+ScrollingList.size()+")");
+		  
 		
 		  
 		  Experience TappingExperience = new Experience(TappingList);
 		  Experience ScrollingExperience = new Experience(ScrollingList);
+		  
+		  
+		  TappingExperience.ModifyPosition();
+		  System.out.println("[Phase6] Tap Experience ModifyPosition");
 		  
 		  
 		  String filterPath = filePath.replace(".txt", "_filter.json");
@@ -76,7 +81,7 @@ public class Main {
 		  {
 			  NoiseFilter noisfilter = new NoiseFilter(filterFile);
 			  
-			  System.out.print("[Phase6] ");
+			  System.out.print("[Phase7] ");
 			  noisfilter.FilterOutTap(TappingExperience);
 			  noisfilter.FilterOutScroll(ScrollingExperience);
 			  System.out.println("");
@@ -97,6 +102,9 @@ public class Main {
 		  String CDFResult = analysis.getCDF();
 		  
 		  SaveAsFile(CDFResult,ResultDir + file.getName().replace(".txt","_CDF.csv"));
+		  
+		  String pathCDFResult = analysis.getPathCDF();
+		  SaveAsFile(pathCDFResult,ResultDir + file.getName().replace(".txt","_path_CDF.csv"));
 		  
 	  }
 	  
