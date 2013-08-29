@@ -71,8 +71,8 @@ public class Main {
 		  Experience ScrollingExperience = new Experience(ScrollingList);
 		  
 		  
-		  TappingExperience.ModifyPosition();
-		  System.out.println("[Phase6] Tap Experience ModifyPosition");
+		 // TappingExperience.ModifyPosition();
+		 // System.out.println("[Phase6] Tap Experience ModifyPosition");
 		  
 		  
 		  String filterPath = filePath.replace(".txt", "_filter.json");
@@ -104,7 +104,7 @@ public class Main {
 		  SaveAsFile(CDFResult,ResultDir + file.getName().replace(".txt","_CDF.csv"));
 		  
 		  String pathCDFResult = analysis.getPathCDF();
-		  SaveAsFile(pathCDFResult,ResultDir + file.getName().replace(".txt","_path_CDF.csv"));
+		  SaveAsFile(pathCDFResult,ResultDir + file.getName().replace(".txt","_maxDif_CDF.csv"));
 		  
 	  }
 	  

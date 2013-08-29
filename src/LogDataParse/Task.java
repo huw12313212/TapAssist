@@ -13,7 +13,7 @@ public class Task {
 	//public static float ModifyPositionIfTapInY = 0;//595.663f;
 	
 	public static float ModifyPositionIfTapOutX = 0f;
-	public static float ModifyPositionIfTapOutY = 56.0f;
+	public static float ModifyPositionIfTapOutY = 0f;//56.0f;
 	
 	public Task(TaskSegment originData)
 	{
@@ -126,7 +126,18 @@ public class Task {
 	
 	public double GetTaskBeginTime()
 	{
+		
 		return TaskHead.getDouble("time");
+	}
+	
+	public double GetTaskEndTime()
+	{
+		return TaskTail.getDouble("time");
+	}
+	
+	public double GetTaskDuration()
+	{
+		return ((double)TaskTail.getDouble("time")-(double)TaskHead.getDouble("time"));
 	}
 	
 	public void initialize(TaskSegment originData)

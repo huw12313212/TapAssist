@@ -10,6 +10,41 @@ public class AttemptSegment {
 	
 	public List<JSONObject> TouchEventList = new ArrayList<JSONObject>();
 	
+	public double MaxDif(MultiTouchSelector getter)
+	{
+		double FirstX = this.getBeginX(getter);
+		double FirstY = this.getBeginY(getter);
+		
+		double mostDif = 0;
+		
+		for(int i = 0;i<TouchEventList.size();i++)
+		{
+			JSONObject jsonData = TouchEventList.get(i);
+			JSONArray pointers = jsonData.getJSONArray("pointers");
+			JSONObject target = getter.Select(pointers);
+			
+			double targetX = target.getDouble("x");
+			double targetY = target.getDouble("y");
+			
+			double dif = findDif(targetX,targetY,FirstX,FirstY);
+			
+			
+			if(mostDif<dif)mostDif=dif;
+			
+		}
+		return mostDif;
+	}
+	
+	public double findDif(double x,double y,double x2,double y2)
+	{
+		double difX = x-x2;
+		double difY = y-y2;
+		
+		double distance = Math.sqrt((difX*difX)+(difY*difY));
+		
+		return distance;
+	}
+	
 	public boolean isValidate()
 	{
 		JSONObject head = getHead();

@@ -48,8 +48,8 @@ public class TapAssistAnalysis {
 		List<Double> scrolly = scroll.getAllDistScroll("y");
 		
 		
-		List<Double> pathTap = tap.getAllTapPathLength();
-		List<Double> pathScroll = scroll.getAllScrollPathLength();
+		List<Double> pathTap = tap.getAllMaxDifTapping();
+		List<Double> pathScroll = scroll.getAllMaxDifScroll();
 		
 		
 		if(tapX.size()==0 || scrollx.size()==0)
@@ -137,7 +137,7 @@ public class TapAssistAnalysis {
 			return "CDF failed";
 		}
 		
-		String data = "CDF,dist,tapPath,scrollPath,,CorrectRatio,tap%,scroll%,(Tap+Scroll)%\n";
+		String data = "CDF,dist,tapMaxDif,scrollMaxDif,,CorrectRatio,tap%,scroll%,(Tap+Scroll)%\n";
 		
 		for(int i = 0 ; i < TapPathCDF.size();i++)
 		{
