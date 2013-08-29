@@ -158,7 +158,7 @@ public class Experience
 		String data = "Task,Attempt,result,reason,taskDuration,Task_Detail,begin_time(ms),end_time(ms)," +
 				"maxDif,touchBegin_x,touchBegin_y,touchEnd_x,touchEnd_y,max_x,max_y,min_x,min_y,ave_x," +
 				"ave_y,SD_x,SD_y,x_end-begin,y_end-begin,Max_speed,Min_speed,Ave_speed," +
-				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration\n";
+				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration,ActionDowns\n";
 		
 		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
 		{
@@ -224,6 +224,8 @@ public class Experience
 				data += nowAttempt.getActionDownNumber()+ ",";
 				
 				data += (pathLength /(duration/1000)) + ",";
+				
+				data += nowAttempt.GetActionDownDatas(taskList.get(0).GetTaskBeginTime())+",";
 				
 				data +="\n";
 			}
@@ -341,7 +343,7 @@ public class Experience
 		String data = "Task,Attempt,result,reason,TargetX,TargetY,begin_time(ms)(attempt),end_time(ms)(attempt),task_duration(ms)," +
 				"maxDif,touchBegin_x,touchBegin_y,touchEnd_x,touchEnd_y,max_x,max_y,min_x,min_y,ave_x," +
 				"ave_y,SD_x,SD_y,x_end-begin,y_end-begin,Max_speed,Min_speed,Ave_speed," +
-				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration\n";
+				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration,ActionDowns\n";
 		
 		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
 		{
@@ -398,6 +400,8 @@ public class Experience
 				data += nowAttempt.getActionDownNumber()+ ",";
 				
 				data += (pathLength /(duration/1000)) + ",";
+				
+				data += nowAttempt.GetActionDownDatas(taskList.get(0).GetTaskBeginTime())+",";
 				
 				data +="\n";
 			}

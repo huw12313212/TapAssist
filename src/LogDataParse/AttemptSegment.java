@@ -40,6 +40,9 @@ public class AttemptSegment {
 		double difX = x-x2;
 		double difY = y-y2;
 		
+		difX = Math.abs(difX);
+		difY = Math.abs(difY);
+		
 		double distance = Math.sqrt((difX*difX)+(difY*difY));
 		
 		return distance;
@@ -69,6 +72,44 @@ public class AttemptSegment {
 		}
 		
 		return sum;
+	}
+	
+	public List<JSONObject> getAllActionDown()
+	{
+		List<JSONObject> allActionDown = new ArrayList<JSONObject>();
+		for(int i = 0; i < TouchEventList.size();i++)
+		{
+			if(TouchEventList.get(i).getString("action").contains("DOWN"))
+			{
+				allActionDown.add(TouchEventList.get(i));
+			}
+		}
+		
+		return allActionDown;
+	}
+	
+	public String GetActionDownDatas(double baseLine)
+	{
+		String result = "ActionDown:";
+		
+		List<JSONObject> allObject = getAllActionDown();
+		
+		for(int i=0;i<allObject.size();i++)
+		{
+			JSONObject target = allObject.get(i);
+			result+=",Down"+i;
+			result+=",t:,"+(target.getDouble("time")-baseLine);
+			
+			JSONArray pointers = target.getJSONArray("pointers");
+			JSONObject newPoint = pointers.getJSONObject(pointers.length()-1);
+			
+			result+=",x:,"+newPoint.getDouble("x");
+			result+=",y:,"+newPoint.getDouble("y");
+			result+=",";
+		}
+		
+		
+		return result;
 	}
 	
 	public double getPathLength(MultiTouchSelector selector)
