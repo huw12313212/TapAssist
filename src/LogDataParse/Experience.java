@@ -245,7 +245,10 @@ public class Experience
 		
 		data += "Total Attempt,"+ this.GetTotalAttemptTime()+"\n";
 		data += "Average Attempt,"+ ((float)this.GetTotalAttemptTime()/(float)this.GetTotalTaskTimes())+"\n";
+		data += "SucAveAttempt," +this.GetAveAttemptsWithSuccess()+"\n";
 		data += "Average Duration," + ((double)this.GetTotalTaskDuration()/this.GetTotalTaskTimes())+"\n";
+		data += "SucAveDuration," +this.GetAveDurationWithSuccess()+"\n";
+		
 		}
 		
 		
@@ -267,6 +270,22 @@ public class Experience
 		}
 		
 		return times;
+	}
+	
+	public List<Task> GetAllSuccessTask()
+	{
+		List<Task> tasks = new ArrayList<Task>();
+
+		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
+		{
+			Task task = taskList.get(taskNum);
+			if(task.GetResult().equals("success"))
+			{
+				tasks.add(task);
+			}
+		}
+		
+		return tasks;
 	}
 	
 	public List<Task> GetAllFailedTask()
@@ -304,6 +323,52 @@ public class Experience
 		return duration;
 	}
 	
+	public double GetAveDurationWithSuccess()
+	{
+		double total = 0;
+		
+		List<Task> successTasks = this.GetAllSuccessTask();
+		
+		if(successTasks.size() == 0) 
+		{
+			return Double.NaN;
+		}
+		
+		for(int i=0;i<successTasks.size();i++)
+		{
+			Task task = successTasks.get(i);
+			
+			total += task.GetTaskDuration();
+		}
+		
+		double result = total/successTasks.size();
+		
+		return result;
+	}
+	
+	public double GetAveAttemptsWithSuccess()
+	{
+		double total = 0;
+		
+		List<Task> successTasks = this.GetAllSuccessTask();
+		
+		if(successTasks.size() == 0) 
+		{
+			return Double.NaN;
+		}
+		
+		for(int i=0;i<successTasks.size();i++)
+		{
+			Task task = successTasks.get(i);
+			
+			total += task.AttemptList.size();
+		}
+		
+		double result = total/successTasks.size();
+		
+		return result;
+	}
+	
 	public int GetTotalAttemptTime()
 	{
 		
@@ -337,6 +402,8 @@ public class Experience
 		
 		return allTask;
 	}
+	
+
 	
 	public String ExportTappingAttemptAnalysisAsCSV()
 	{
