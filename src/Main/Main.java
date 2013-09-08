@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 
 import LogDataParse.Experience;
 import LogDataParse.LogDataParse;
+import LogDataParse.MultiTouchAnalysis;
 import LogDataParse.NoiseFilter;
 import LogDataParse.TaskSegment;
 import Model.TapAssistAnalysis;
@@ -18,11 +21,12 @@ public class Main {
 
 	 public static String ContentDir = "./Content/";
 	 public static String ResultDir = "./Result/";
+	 public static String MultiTouchDir = "./MultiTouch/";
+	 
+	 public static List<Experience> TappingExperiences = new ArrayList<Experience>();
 	
 	  public static void main(String args[]) throws Exception 
 	  {
-		
-		  
 		  File f = new File(ContentDir);
 		  
 		  File[] list = f.listFiles();
@@ -37,8 +41,13 @@ public class Main {
 			  ProcessFile(path);
 			  }
 		  }
-
+		  
+		  MultiTouchAnalysis.Analysis(TappingExperiences);
+		  //Map<String,List<Experience>> map = MultiTouchAnalysis.SplitId(TappingExperiences);
 	  }
+	  
+	
+	
 	  
 	  public static void ProcessFile(String filePath)throws Exception 
 	  {
@@ -70,7 +79,11 @@ public class Main {
 		  Experience TappingExperience = new Experience(TappingList);
 		  Experience ScrollingExperience = new Experience(ScrollingList);
 		  
+		  TappingExperience.SetFilePath(filePath);
+		  ScrollingExperience.SetFilePath(filePath);
 		  
+		  
+		  TappingExperiences.add(TappingExperience);
 		 // TappingExperience.ModifyPosition();
 		 // System.out.println("[Phase6] Tap Experience ModifyPosition");
 		  
@@ -124,8 +137,6 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		  
-
 	  }
 	  
 	  public static String Detail(List before,List after)

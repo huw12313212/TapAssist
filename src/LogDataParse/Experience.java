@@ -1,11 +1,37 @@
 package LogDataParse;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
 
 public class Experience 
 {
 	public static MultiTouchSelector multiTouchSelector = new MultiTouchSelector();
+	
+	public void SetFilePath(String str)
+	{
+		_filePath = str;
+	}
+	
+	private String _filePath;
+	
+	public String GetNameId()
+	{
+		File f = new File(_filePath);
+		
+		String currentName = f.getName();
+		
+		if(currentName.contains("*"))
+		{
+			return currentName.split("\\*")[0];
+		}
+		else
+		{
+			return currentName;
+		}
+	}
 	
 	public Experience(List<TaskSegment> originData)
 	{
@@ -403,7 +429,33 @@ public class Experience
 		return allTask;
 	}
 	
-
+	public List<TapAttemptInfo> GetAllTapAttemptInfo()
+	{
+		List<TapAttemptInfo> allTapAttemptInfo = new ArrayList<TapAttemptInfo>();
+		
+		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
+		{
+			Task task = taskList.get(taskNum);
+			List<AttemptSegment> attemptList = task.AttemptList;
+			
+			for(int attemptNum = 0 ; attemptNum < attemptList.size(); attemptNum++)
+			{
+				AttemptSegment nowAttempt = attemptList.get(attemptNum);
+				//MultiTouchSelector selector = new MultiTouchSelectorWithShortestDistance(task.GetTargetX(),task.GetTargetY());
+				
+				TapAttemptInfo info = new TapAttemptInfo();
+				
+				info.targetX = task.GetTargetX();
+				info.targetY = task.GetTargetY();
+				info.multiTouchCount = nowAttempt.getActionDownNumber();
+				info.pointers = nowAttempt.GetActionDownPoints();// nowAttempt.;
+				
+				allTapAttemptInfo.add(info);
+			}
+		}
+		
+		return allTapAttemptInfo;
+	}
 	
 	public String ExportTappingAttemptAnalysisAsCSV()
 	{

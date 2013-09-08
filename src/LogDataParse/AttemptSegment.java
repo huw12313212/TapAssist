@@ -107,9 +107,25 @@ public class AttemptSegment {
 			result+=",y:,"+newPoint.getDouble("y");
 			result+=",";
 		}
-		
-		
 		return result;
+	}
+	
+	public List<JSONObject> GetActionDownPoints()
+	{
+		
+		List<JSONObject> allObject = getAllActionDown();
+		List<JSONObject> points = new ArrayList<JSONObject>();
+		
+		for(int i=0;i<allObject.size();i++)
+		{
+			JSONObject target = allObject.get(i);
+			
+			JSONArray pointers = target.getJSONArray("pointers");
+			JSONObject newPoint = pointers.getJSONObject(pointers.length()-1);
+			
+			points.add(newPoint);
+		}
+		return points;
 	}
 	
 	public double getPathLength(MultiTouchSelector selector)

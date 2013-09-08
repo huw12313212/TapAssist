@@ -1,5 +1,7 @@
 package LogDataParse;
 
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,6 +15,22 @@ public class MultiTouchSelectorWithShortestDistance extends MultiTouchSelector{
 		targetY = m;
 	}
 	
+	@Override
+	public JSONObject Select(List<JSONObject> target)
+	{
+		JSONObject shortest = target.get(0);
+		
+		
+		for(int i =0; i < target.size();i++)
+		{
+			if(GetDistance(shortest.getDouble("x"),shortest.getDouble("y"))>GetDistance(target.get(i).getDouble("x"),target.get(i).getDouble("y")))
+			{
+				shortest = target.get(i);
+			}
+		}
+	
+		return shortest;
+	}
 
 
 	@Override
@@ -20,7 +38,6 @@ public class MultiTouchSelectorWithShortestDistance extends MultiTouchSelector{
 	{
 		JSONObject shortest = target.getJSONObject(0);
 		
-		//int index = 0;
 		
 		for(int i =0; i < target.length();i++)
 		{
