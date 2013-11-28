@@ -79,6 +79,8 @@ public class Main {
 		  Experience TappingExperience = new Experience(TappingList);
 		  Experience ScrollingExperience = new Experience(ScrollingList);
 		  
+		  ScrollingExperience.RemoveTargets(ScrollingExperience.GetAllTimeOutList());
+		  
 		  TappingExperience.SetFilePath(filePath);
 		  ScrollingExperience.SetFilePath(filePath);
 		  

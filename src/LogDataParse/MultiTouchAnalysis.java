@@ -19,6 +19,9 @@ public class MultiTouchAnalysis {
 		Map<String,List<Experience>> experiences_map = SplitId(tappingExperiences);
 		Map<String,List<TapAttemptInfo>> tapAttemptsInfo_map = GetAllTapAttempt(experiences_map);
 		
+		
+		String Analysis = "name,pureMiss,pureOverslop,miss&overslop,success \n";
+		
 		for(String name : tapAttemptsInfo_map.keySet())
 		{
 			List<TapAttemptInfo> infos = tapAttemptsInfo_map.get(name);
@@ -26,9 +29,22 @@ public class MultiTouchAnalysis {
 			
 			String path = Main.MultiTouchDir + name+"_multitouch.csv";
 			
+			
+			
 			Main.SaveAsFile(result,path);
 			System.out.println(path);
 		}
+		
+		for(String name :experiences_map.keySet() )
+		{
+			List<Experience> elist = experiences_map.get(name);
+			
+			Experience e = elist.get(0);
+			
+			Analysis += name+","+e._PureMiss+","+e._PureOverSlop+","+e._OverslopAndMiss+","+e._Success+",\n";
+		}
+		
+		Main.SaveAsFile(Analysis,Main.MultiTouchDir +"analysis.csv");
 	}
 	
 	

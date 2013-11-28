@@ -4,10 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONArray;
-
 public class Experience 
 {
+	public double _PureOverSlop = 0;
+	public double _PureMiss = 0;
+	public double _OverslopAndMiss = 0;
+	public double _Success = 0;
+	
 	public static MultiTouchSelector multiTouchSelector = new MultiTouchSelector();
 	
 	public void SetFilePath(String str)
@@ -178,6 +181,28 @@ public class Experience
 		return result;
 	}
 	
+	public List<Task> GetAllTimeOutList()	
+	{
+		List<Task> timeOuts = new ArrayList<Task>();
+		
+		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
+		{
+			Task task = taskList.get(taskNum);
+			
+			if(task.GetReason().equals("timeout"))
+			{
+			
+			timeOuts.add(task);
+			}
+		}
+		return timeOuts;
+	}
+	
+	public void RemoveTargets(List<Task> target)
+	{
+		taskList.removeAll(target);
+	}
+	
 	
 	public String ExportScrollingAttemptAnalysisAsCSV()
 	{
@@ -185,6 +210,8 @@ public class Experience
 				"maxDif,touchBegin_x,touchBegin_y,touchEnd_x,touchEnd_y,max_x,max_y,min_x,min_y,ave_x," +
 				"ave_y,SD_x,SD_y,x_end-begin,y_end-begin,Max_speed,Min_speed,Ave_speed," +
 				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration,ActionDowns\n";
+		
+		double UnderSlop = 0;
 		
 		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
 		{
@@ -254,6 +281,20 @@ public class Experience
 				data += nowAttempt.GetActionDownDatas(taskList.get(0).GetTaskBeginTime())+",";
 				
 				data +="\n";
+				
+				
+				
+				double maxDif = nowAttempt.MaxDif(selector);
+			
+				
+				
+				if(maxDif < TouchSlop)
+				{
+					//沒點到 又 OverSlop
+					
+					UnderSlop ++;
+					
+				}
 			}
 		}
 		
@@ -275,6 +316,11 @@ public class Experience
 		data += "Average Duration," + ((double)this.GetTotalTaskDuration()/this.GetTotalTaskTimes())+"\n";
 		data += "SucAveDuration," +this.GetAveDurationWithSuccess()+"\n";
 		
+		data += "UnderSlop,"+UnderSlop+",";
+		data += "ScrollAttemp,"+(this.GetTotalAttemptTime()-UnderSlop)+",\n";
+		
+		data += "UnderSlop,"+(UnderSlop/this.GetTotalAttemptTime())+",";
+		data += "ScrollAttemp,"+((this.GetTotalAttemptTime()-UnderSlop))/this.GetTotalAttemptTime()+",\n";
 		}
 		
 		
@@ -457,12 +503,23 @@ public class Experience
 		return allTapAttemptInfo;
 	}
 	
+	
+
+	double TouchSlop = 10*0.192/0.1814;//iOS  //16 android[samsung];
+	double IconSize = 12;//(android = 12mm)
+	//double IconSize = 14;//(iOS = 14mm)
+	
 	public String ExportTappingAttemptAnalysisAsCSV()
 	{
-		String data = "Task,Attempt,result,reason,TargetX,TargetY,begin_time(ms)(attempt),end_time(ms)(attempt),task_duration(ms)," +
+		String data = "Task,Attempt,result,reason,TargetX,TargetY,begin_time(ms)(attempt),end_time(ms)(attempt),task_duration(ms),DifX,DifY," +
 				"maxDif,touchBegin_x,touchBegin_y,touchEnd_x,touchEnd_y,max_x,max_y,min_x,min_y,ave_x," +
 				"ave_y,SD_x,SD_y,x_end-begin,y_end-begin,Max_speed,Min_speed,Ave_speed," +
 				"SD_speed,duration(ms),stroke_length,multitouch,V = stroke_length/time_duration,ActionDowns\n";
+		
+		double PureMiss = 0;
+		double PureOverSlopCount = 0;
+		double OverSlopAndMiss = 0;
+
 		
 		for(int taskNum = 0 ; taskNum < taskList.size(); taskNum++)
 		{
@@ -472,7 +529,7 @@ public class Experience
 			for(int attemptNum = 0 ; attemptNum < attemptList.size(); attemptNum++)
 			{
 				AttemptSegment nowAttempt = attemptList.get(attemptNum);
-				MultiTouchSelector selector = new MultiTouchSelectorWithShortestDistance(task.GetTargetX(),task.GetTargetY());
+				MultiTouchSelectorWithShortestDistance selector = new MultiTouchSelectorWithShortestDistance(task.GetTargetX(),task.GetTargetY());
 				
 				data +=(taskNum+1)+",";
 				data +=(attemptNum+1)+",";
@@ -482,11 +539,51 @@ public class Experience
 				data +=task.GetTargetX()+",";
 				data +=task.GetTargetY()+",";
 				
+				
+				
 				data +=(nowAttempt.getBeginTime() - taskList.get(0).GetTaskBeginTime())+",";
 				data +=(nowAttempt.getEndTime()- taskList.get(0).GetTaskBeginTime())+",";
 				data +=(task.GetTaskDuration())+",";
 				
-				data += nowAttempt.MaxDif(selector)+",";
+				double DifX = nowAttempt.findDif(selector,"x");
+				double DifY = nowAttempt.findDif(selector,"y");
+				
+				data += DifX+",";
+				data += DifY+",";
+				
+				double Xmm = DifX*0.1814;
+				double Ymm = DifY*0.1814;
+				
+				
+				double maxDif = nowAttempt.MaxDif(selector);
+				
+				if(Xmm <= IconSize/2 && Ymm <= IconSize/2)
+				{
+					//有點到
+					
+					//OverSlop
+					if(maxDif > TouchSlop)
+					{
+						PureOverSlopCount ++;
+					}
+					
+				}
+				else if(maxDif > TouchSlop)
+				{
+					//沒點到 又 OverSlop
+					
+					OverSlopAndMiss ++;
+					
+				}
+				else
+				{
+					//沒點到但是沒有
+					PureMiss ++;
+				}
+				
+				
+				
+				data += maxDif+",";
 				
 				data += nowAttempt.getBeginX(selector)+",";
 				data += nowAttempt.getBeginY(selector)+",";
@@ -540,8 +637,22 @@ public class Experience
 		data += "Fail," + failed.size()+",";
 		data += "Sucess Ratio," + (this.GetTaskSuccessTimes()/(double)this.GetTotalTaskTimes())+",\n";
 		data += "AveDuration,"+((double)this.GetTotalTaskDuration()/this.GetTotalTaskTimes())+",,,"+"missd:,"+missed.size()+"\n";
-		data += ",,,,"+"overslop,"+overslop.size();
+		data += ",,,,"+"overslop,"+overslop.size()+"\n";
+		data += "PureMiss,"+PureMiss+",";
+		data += "PureOverSlop,"+PureOverSlopCount+",";
+		data += "OverSlop&Miss,"+OverSlopAndMiss+",";
+		data += "Success,"+((double)this.GetTotalTaskTimes()-((PureMiss+PureOverSlopCount+OverSlopAndMiss)))+",";
+		
+		_PureOverSlop = PureOverSlopCount/(double)this.GetTotalTaskTimes();
+		_PureMiss = PureMiss/(double)this.GetTotalTaskTimes();
+		_OverslopAndMiss = OverSlopAndMiss/(double)this.GetTotalTaskTimes();
+		_Success = +(1-((PureMiss+PureOverSlopCount+OverSlopAndMiss)/(double)this.GetTotalTaskTimes()));
+		
+		
+		
 		}
+		
+		
 		
 		return data;
 	}

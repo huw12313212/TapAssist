@@ -35,6 +35,22 @@ public class AttemptSegment {
 		return mostDif;
 	}
 	
+	public double findDif(MultiTouchSelectorWithShortestDistance s,String tag)
+	{
+		List<JSONObject> ActionDowns = this.GetActionDownPoints();
+		
+		JSONObject actionDown = s.Select(ActionDowns);
+		
+		double dif;
+		
+		if(tag == "x")
+			 dif = findDif(actionDown.getDouble(tag),0,s.targetX,0);
+		else
+			dif = findDif(actionDown.getDouble(tag),0,s.targetY,0);
+		
+		return dif;
+	}
+	
 	public double findDif(double x,double y,double x2,double y2)
 	{
 		double difX = x-x2;

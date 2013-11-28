@@ -11,8 +11,8 @@ public class MultiTouchSelectorWithShortestDistance extends MultiTouchSelector{
 	
 	public MultiTouchSelectorWithShortestDistance(double l,double m)
 	{
-		targetX = l;
-		targetY = m;
+		targetX = l+33;
+		targetY = m+33;
 	}
 	
 	@Override
